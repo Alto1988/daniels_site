@@ -1,13 +1,19 @@
+import json
+from django.http import response
+
 from django.test import TestCase
-from .models import Category, ArtPiece
+from graphene_django.utils.testing import GraphQLTestCase
+
+from .models import ArtPiece, Category
 
 
 class TestArtShop(TestCase):
     '''
     TODO:
         - Add tests for the following:
-        - Models
-        - URLS
+        - Models -> we only did the initial tests for the category model
+        -- still need to test the art piece model
+        - We need to add test for the schemas before we add anything else...
         - Add mutations to the schema
     '''
     def setUp(self):
@@ -40,5 +46,51 @@ class TestArtShop(TestCase):
         '''
         Delete the category and art piece created for testing
         '''
+        self.category.delete()
+        self.art_piece.delete()
+
+
+class GraphQLTestCase(GraphQLTestCase):
+    def setUp(self):
+        super().setUp()
+        self.category = Category.objects.create(name='Test Category')
+        self.art_piece = ArtPiece.objects.create(
+            name='Test Art Piece',
+            description='Test Description',
+            category=self.category,
+            price=100.00)
+
+    def test_some_randomness(self):
+        self.assertEqual(2 + 2, 4)
+
+    def test_query_art_piece_basic_query(self):
+        return_query = self.query('''
+            query {
+                artPieces {
+                    id,
+                    name,
+                    description,
+                    price
+                }
+            }
+            ''')
+        expected_result = {
+            'data': {
+                'artPieces': [{
+                    'id': '1',
+                    'name': 'Test Art Piece',
+                    'description': 'Test Description',
+                    'price': '100.00'
+                }]
+            }
+        }
+        self.assertResponseNoErrors(return_query)
+        self.assertJSONEqual(return_query.content, expected_result)
+
+    def test_query_category_by_name(self):
+        pass
+
+    def tearDown(self):
+        '''Clean up purposes'''
         self.category.delete()
         self.art_piece.delete()
