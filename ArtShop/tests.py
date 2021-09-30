@@ -35,7 +35,6 @@ class TestArtShop(TestCase):
 
     def test_category_name_is_valid_true(self):
         test_category = Category.objects.filter(name='Test Category')
-        print(test_category[0])
         self.assertTrue(test_category.exists())
 
     def test_category_name_is_valid_false(self):
@@ -107,6 +106,19 @@ class GraphQLTestCase(GraphQLTestCase):
         self.assertResponseNoErrors(return_query)
         self.assertJSONEqual(return_query.content, expected_result)
 
+    def test_query_category_by_name_fail(self):
+        return_query = self.query('''
+            query {
+                categoryByName(name: "Test False") {
+                    id,
+                    name
+                }
+            }
+            ''')
+        expected_result = {'data': {'categoryByName': None}}
+        self.assertResponseNoErrors(return_query)
+        self.assertJSONEqual(return_query.content, expected_result)
+
     def test_query_art_pieces_by_name(self):
         return_query = self.query('''
             query {
@@ -130,6 +142,28 @@ class GraphQLTestCase(GraphQLTestCase):
         }
         self.assertResponseNoErrors(return_query)
         self.assertJSONEqual(return_query.content, expected_result)
+
+    def test_query_art_pieces_by_name_fail(self):
+        return_query = self.query('''
+            query{
+                artPiecesByName(name: "Test Fail") {
+                        id,
+                        name,
+                        description,
+                        price
+                    }
+            }
+            ''')
+        print(return_query.content)
+        expected_result = {'data': {'artPiecesByName': []}}
+        self.assertResponseNoErrors(return_query)
+        self.assertJSONEqual(return_query.content, expected_result)
+
+    '''
+    TODO:
+        - artPiecesByCategory is the next test
+        - Before writing this test we need to fix the resolver for this method; returns all categories instead of the one that matches the string
+    '''
 
     def tearDown(self):
         '''Clean up purposes'''
