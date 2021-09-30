@@ -1,6 +1,8 @@
+from django.core.checks.messages import Error
 import graphene
 from graphene.types import schema
 from graphene_django import DjangoObjectType
+from django.core.validators import RegexValidator
 from ArtShop.models import ArtPiece, Category
 
 
@@ -37,7 +39,18 @@ class Query(graphene.ObjectType):
         return ArtPiece.objects.filter(name__icontains=name)
 
     def resolve_art_pieces_by_category(self, info, name, **kwargs):
-        return ArtPiece.objects.filter(category__name__icontains=name)
+        valid_category = r'^[a-zA-Z0-9_]'
+        validator = RegexValidator(regex=valid_category,
+                                   message='Invalid category name',
+                                   code='invalid_category')
+        validator(name)
+
+        ##TODO: This is a hack to get the name of the category to work might implement something better later
+        ##TODO: Need to find a way to neglect the case of the name ex: Peaches -> peaches -> PEACHES ...
+        if Category.objects.filter(name=name).exists():
+            return ArtPiece.objects.filter(category__name=name)
+        else:
+            return []
 
 
 schema = graphene.Schema(query=Query)

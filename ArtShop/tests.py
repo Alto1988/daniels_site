@@ -154,7 +154,6 @@ class GraphQLTestCase(GraphQLTestCase):
                     }
             }
             ''')
-        print(return_query.content)
         expected_result = {'data': {'artPiecesByName': []}}
         self.assertResponseNoErrors(return_query)
         self.assertJSONEqual(return_query.content, expected_result)
@@ -164,6 +163,45 @@ class GraphQLTestCase(GraphQLTestCase):
         - artPiecesByCategory is the next test
         - Before writing this test we need to fix the resolver for this method; returns all categories instead of the one that matches the string
     '''
+
+    def test_query_art_pieces_by_category(self):
+        return_query = self.query('''
+            query {
+                artPiecesByCategory(name: "Test Category") {
+                    id,
+                    name,
+                    description,
+                    price
+                }
+            }
+            ''')
+        expected_result = {
+            'data': {
+                'artPiecesByCategory': [{
+                    'id': '1',
+                    'name': 'Test Art Piece',
+                    'description': 'Test Description',
+                    'price': '100.00'
+                }]
+            }
+        }
+        self.assertResponseNoErrors(return_query)
+        self.assertJSONEqual(return_query.content, expected_result)
+
+    def test_query_art_pieces_by_category_fail(self):
+        return_query = self.query('''
+            query {
+                artPiecesByCategory(name: "Test False") {
+                    id,
+                    name,
+                    description,
+                    price
+                }
+            }
+            ''')
+        expected_result = {'data': {'artPiecesByCategory': []}}
+        self.assertResponseNoErrors(return_query)
+        self.assertJSONEqual(return_query.content, expected_result)
 
     def tearDown(self):
         '''Clean up purposes'''
