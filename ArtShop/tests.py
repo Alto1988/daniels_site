@@ -88,7 +88,48 @@ class GraphQLTestCase(GraphQLTestCase):
         self.assertJSONEqual(return_query.content, expected_result)
 
     def test_query_category_by_name(self):
-        pass
+        return_query = self.query('''
+            query {
+                categoryByName(name: "Test Category") {
+                    id,
+                    name
+                }
+            }
+            ''')
+        expected_result = {
+            'data': {
+                'categoryByName': {
+                    'id': '1',
+                    'name': 'Test Category'
+                }
+            }
+        }
+        self.assertResponseNoErrors(return_query)
+        self.assertJSONEqual(return_query.content, expected_result)
+
+    def test_query_art_pieces_by_name(self):
+        return_query = self.query('''
+            query {
+                artPiecesByName(name: "Test Art Piece") {
+                    id,
+                    name,
+                    description,
+                    price
+                }
+            }
+            ''')
+        expected_result = {
+            'data': {
+                'artPiecesByName': [{
+                    'id': '1',
+                    'name': 'Test Art Piece',
+                    'description': 'Test Description',
+                    'price': '100.00'
+                }]
+            }
+        }
+        self.assertResponseNoErrors(return_query)
+        self.assertJSONEqual(return_query.content, expected_result)
 
     def tearDown(self):
         '''Clean up purposes'''
