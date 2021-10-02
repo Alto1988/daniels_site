@@ -11,10 +11,9 @@ class TestArtShop(TestCase):
     '''
     TODO:
         - Add tests for the following:
-        - Models -> we only did the initial tests for the category model
-        -- still need to test the art piece model
-        - We need to add test for the schemas before we add anything else...
-        - Add mutations to the schema
+        - Models -> we only did the initial tests for the category model: DONE
+        - We need to add test for the schemas before we add anything else:DONE
+        - Add mutations to the schema:DONE for now...
     '''
     def setUp(self):
         '''
@@ -26,12 +25,6 @@ class TestArtShop(TestCase):
             description='Test Description',
             category=self.category,
             price=100.00)
-
-    # def test_that_fails(self):
-    #     self.assertTrue(False)
-
-    def test_that_passes(self):
-        self.assertEqual(1 + 1, 2)
 
     def test_category_name_is_valid_true(self):
         test_category = Category.objects.filter(name='Test Category')
@@ -258,3 +251,24 @@ class GraphQLTestCaseMutations(GraphQLTestCase):
         }
         self.assertResponseNoErrors(return_query)
         self.assertJSONEqual(return_query.content, expected_result)
+
+    def test_create_art_piece_fail(self):
+        #Writing to see if someone inputs a wrong value into the mutation that it fails. eg. price being 12.50 instead of "12.50"
+        return_query = self.query('''
+            mutation {
+                createArtPiece(name:"big booty judy", description:"Oh so big", price: 12.50, category:"NSFW"){
+                    artPiece{
+                    id,
+                    name,
+                    description,
+                    price,
+                    category{
+                        id,
+                        name
+                    }
+                        }
+                    }
+            }
+                ''')
+        expected_result = {'data': {'createArtPiece': {'artPiece': None}}}
+        self.assertResponseHasErrors(return_query)
