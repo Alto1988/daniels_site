@@ -49,7 +49,7 @@ class TestArtShop(TestCase):
         self.art_piece.delete()
 
 
-class GraphQLTestCase(GraphQLTestCase):
+class GraphQLTestCaseQueries(GraphQLTestCase):
     def setUp(self):
         super().setUp()
         self.category = Category.objects.create(name='Test Category')
@@ -207,3 +207,54 @@ class GraphQLTestCase(GraphQLTestCase):
         '''Clean up purposes'''
         self.category.delete()
         self.art_piece.delete()
+
+
+class GraphQLTestCaseMutations(GraphQLTestCase):
+    '''
+        TODO: start writing the test for the mutations
+            - createArtPiece
+    '''
+    def setUp(self):
+        super().setUp()
+        self.category = Category.objects.create(name='Test Category')
+        self.art_piece = ArtPiece.objects.create(
+            name='Test Art Piece',
+            description='Test Description',
+            category=self.category,
+            price=100.00)
+
+    def test_create_art_piece(self):
+        return_query = self.query('''
+            mutation {
+                createArtPiece(name:"big booty judy", description:"Oh so big", price: "12.50", category:"NSFW"){
+                    artPiece{
+                    id,
+                    name,
+                    description,
+                    price,
+                    category{
+                        id,
+                        name
+                    }
+                        }
+                    }
+            }
+                ''')
+        expected_result = {
+            'data': {
+                'createArtPiece': {
+                    'artPiece': {
+                        'id': '2',
+                        'name': 'big booty judy',
+                        'description': 'Oh so big',
+                        'price': '12.50',
+                        'category': {
+                            'id': '2',
+                            'name': 'NSFW'
+                        }
+                    }
+                }
+            }
+        }
+        self.assertResponseNoErrors(return_query)
+        self.assertJSONEqual(return_query.content, expected_result)

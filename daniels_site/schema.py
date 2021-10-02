@@ -1,9 +1,10 @@
-from django.core.checks.messages import Error
 import graphene
+from graphene import Decimal
+from ArtShop.models import ArtPiece, Category
+from django.core.checks.messages import Error
+from django.core.validators import RegexValidator
 from graphene.types import schema
 from graphene_django import DjangoObjectType
-from django.core.validators import RegexValidator
-from ArtShop.models import ArtPiece, Category
 
 
 class CategoryType(DjangoObjectType):
@@ -53,4 +54,29 @@ class Query(graphene.ObjectType):
             return []
 
 
-schema = graphene.Schema(query=Query)
+class ArtPieceMutations(graphene.Mutation):
+    class Arguments:
+        name = graphene.String()
+        description = graphene.String()
+        price = graphene.Decimal()
+        category = graphene.String()
+
+    art_piece = graphene.Field(ArtPieceType)
+
+    @classmethod
+    def mutate(cls, root, info, name, description, price, category):
+        mutation_category = Category(name=category)
+        art_piece = ArtPiece(name=name,
+                             description=description,
+                             price=price,
+                             category=mutation_category)
+        mutation_category.save()
+        art_piece.save()
+        return ArtPieceMutations(art_piece=art_piece)
+
+
+class Mutation(graphene.ObjectType):
+    create_art_piece = ArtPieceMutations.Field()
+
+
+schema = graphene.Schema(query=Query, mutation=Mutation)
