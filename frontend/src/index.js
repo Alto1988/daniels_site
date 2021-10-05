@@ -1,10 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { ArtNavHome } from "./components/Navigation/navbar";
 
 export default function App() {
   return (
     <div>
-      <h1>This is the entry point.</h1>
+      <ArtNavHome />
     </div>
   );
 }
