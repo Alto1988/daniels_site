@@ -75,8 +75,46 @@ class ArtPieceMutations(graphene.Mutation):
         return ArtPieceMutations(art_piece=art_piece)
 
 
+# class ArtPieceUpdateMutation(graphene.Mutation):
+#     class Arguments:
+#         name = graphene.String()
+#         description = graphene.String()
+#         price = graphene.Decimal()
+#         category = graphene.String()
+
+#     art_piece = graphene.Field(ArtPieceType)
+
+#     @classmethod
+#     def mutate(cls, root, info, name, description, price, category):
+#         art_piece = ArtPiece.objects.get(name=name)
+#         art_piece.name = name
+#         art_piece.description = description
+#         art_piece.price = price
+#         art_piece.category = Category(name=category)
+#         art_piece.save()
+#         category.save()
+#         return ArtPieceUpdateMutation(art_piece=art_piece)
+
+
+class ArtPieceDeleteMutation(graphene.Mutation):
+    ok = graphene.Boolean()
+
+    class Arguments:
+        id = graphene.Int()
+
+    art_piece = graphene.Field(ArtPieceType)
+
+    @classmethod
+    def mutate(cls, root, info, id):
+        art_piece = ArtPiece.objects.get(id=id)
+        art_piece.delete()
+        return cls(ok=True)
+
+
 class Mutation(graphene.ObjectType):
     create_art_piece = ArtPieceMutations.Field()
+    # update_art_piece = ArtPieceUpdateMutation.Field()
+    delete_art_piece = ArtPieceDeleteMutation.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

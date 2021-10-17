@@ -73,6 +73,7 @@ function SearchButton(props) {
    * - Need to make a couple drop down menus for where the buttons are
    * - Also need to start writing some tests for the basic comonents
    */
+
   return (
     <Button variant="contained" onClick={() => alert(props.value)}>
       {props.children}

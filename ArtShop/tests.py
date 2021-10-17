@@ -272,3 +272,62 @@ class GraphQLTestCaseMutations(GraphQLTestCase):
                 ''')
         expected_result = {'data': {'createArtPiece': {'artPiece': None}}}
         self.assertResponseHasErrors(return_query)
+
+    def test_update_art_piece(self):
+        '''
+        TODO:  
+            - For tomorrow check the mutation we wrote for the updateArtPiece. Code may need 
+            to be changed.
+            - Update the mutation to update the art piece
+        '''
+        pass
+
+    def test_delete_art_piece(self):
+        return_query = self.query('''
+            mutation {
+                deleteArtPiece(id: 1){
+                    artPiece{
+                    id,
+                    name,
+                    description,
+                    price,
+                    category{
+                        id,
+                        name
+                    }
+                        }
+                    }
+            }
+                ''')
+        expected_result = {'data': {'deleteArtPiece': {'artPiece': None}}}
+        self.assertResponseNoErrors(return_query)
+        self.assertJSONEqual(return_query.content, expected_result)
+
+    def test_delete_art_piece_fail(self):
+        '''
+        WARNING:
+            - This test is working since the return response has errors but, 
+                when the test in ran more than likely you will get an cmd line error 
+        '''
+        return_query = self.query('''
+            mutation {
+                deleteArtPiece(id: 20){
+                    artPiece{
+                    id,
+                    name,
+                    description,
+                    price,
+                    category{
+                        id,
+                        name
+                    }
+                        }
+                    }
+            }
+                ''')
+        self.assertResponseHasErrors(return_query)
+
+    def tearDown(self):
+        '''Clean up purposes'''
+        self.category.delete()
+        self.art_piece.delete()
